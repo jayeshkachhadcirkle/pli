@@ -1,0 +1,41 @@
+// lead management
+
+// node js backend
+
+// users module = id, name, phone, email, password, role, token, google_id
+// advisor module = id, name, phone, email, agent_code, parent_code, type, appointmnet_date
+// policy module= id, policy_no, advisor_id, cname, cphone, plan, type, premium, sum_assured, start_date, back_date, end_date, status, branch,
+// enquiry module = id, type, name, phone, email, source, status
+
+// lead management ===================================================
+
+// node js backend
+
+// users module = id(s), name*, phone*, email*, password*, role, token(s), google_id(s)
+// enquiry module = id(s), type, name*, phone*, email, source, status*(0,1), enquiry_date(s), followup_date, notes, image
+// followup module = id(s), enquiry_id(s), enquiry_date(s), last_followup_date(s), next_followup_date*, image, notes, status*
+
+
+
+{
+  "message": "Login successful",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZGUxNzRjYmE4OTgyZTBkYzZiZjc4NSIsImVtYWlsIjoidTFAZ21haWwuY29tIiwiaWF0IjoxNzU5Mzg1OTI4LCJleHAiOjE3NTkzODk1Mjh9.owNElWJ21HeWLwmPDADl7TumpdEZmXbCmtPde7Dj61U",
+      "user": {
+    "id": "68de174cba8982e0dc6bf785",
+      "name": "u1",
+        "email": "u1@gmail.com",
+          "phone": "4555455445"
+  }
+}
+
+
+fetch('/api/enquiry').then(res => res.json()).then(data => {
+  console.log(data)
+})
+
+fetch('/api/users/68de174cba8982e0dc6bf785').then(res => res.json()).then(data => {
+  console.log(data)
+})
+
+
+document.cookie = "jwt=token";
