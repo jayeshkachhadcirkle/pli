@@ -29,7 +29,7 @@ const followUpSchema = new mongoose.Schema(
             default: '',
         },
         status: {
-            type: int,
+            type: Number,
             enum: [0, 1], // 0: closed, 1: followup
             required: true,
         },
