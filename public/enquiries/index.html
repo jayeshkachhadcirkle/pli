@@ -73,7 +73,7 @@
     <div class="container">
         <h2>Enquiry Management</h2>
         <form id="enquiryForm">
-            <input type="text" name="user_id" placeholder="User ID" required />
+            <input type="hidden" name="user_id" id="user_id" />
             <input type="text" name="type" placeholder="Type" required />
             <input type="text" name="name" placeholder="Name" required />
             <input type="text" name="phone" placeholder="Phone" required />
@@ -92,7 +92,7 @@
         <table id="enquiryTable">
             <thead>
                 <tr>
-                    <th>User ID</th>
+                    <th style="display: none;">User ID</th>
                     <th>Type</th>
                     <th>Name</th>
                     <th>Phone</th>
@@ -112,6 +112,22 @@
         </table>
     </div>
     <script>
+        // Helper to get cookie value by name
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // On page load, set user_id from cookie
+        window.onload = function () {
+            const userId = getCookie('user_id');
+            let cleanUserId = userId.slice(7, -3);
+            if (cleanUserId) {
+                document.getElementById('user_id').value = cleanUserId;
+            }
+        };
+
         async function fetchEnquiries() {
             const res = await fetch('/api/enquiry');
             const enquiries = await res.json();
@@ -120,7 +136,7 @@
             enquiries.forEach(enq => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><input type="text" value="${enq.user_id || ''}" data-id="${enq._id}" class="edit-user_id" /></td>
+                    <td style="display:none;"><input type="text" value="${enq.user_id || ''}" data-id="${enq._id}" class="edit-user_id" /></td>
                     <td><input type="text" value="${enq.type || ''}" data-id="${enq._id}" class="edit-type" /></td>
                     <td><input type="text" value="${enq.name || ''}" data-id="${enq._id}" class="edit-name" /></td>
                     <td><input type="text" value="${enq.phone || ''}" data-id="${enq._id}" class="edit-phone" /></td>
