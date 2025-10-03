@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Enquiry Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            margin: 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        form {
+            margin-bottom: 30px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .actions button {
+            margin-right: 5px;
+        }
+
+        .small {
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Enquiry Management</h2>
+        <form id="enquiryForm">
+            <input type="text" name="user_id" placeholder="User ID" required />
+            <input type="text" name="type" placeholder="Type" required />
+            <input type="text" name="name" placeholder="Name" required />
+            <input type="text" name="phone" placeholder="Phone" required />
+            <input type="email" name="email" placeholder="Email" />
+            <input type="text" name="source" placeholder="Source" />
+            <select name="status">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+            </select>
+            <input type="datetime-local" name="enquiry_date" placeholder="Enquiry Date" />
+            <input type="datetime-local" name="followup_date" placeholder="Followup Date" />
+            <textarea name="notes" placeholder="Notes"></textarea>
+            <input type="text" name="image" placeholder="Image URL" />
+            <button type="submit">Create Enquiry</button>
+        </form>
+        <table id="enquiryTable">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>Enquiry Date</th>
+                    <th>Followup Date</th>
+                    <th>Notes</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Enquiries will be listed here -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        async function fetchEnquiries() {
+            const res = await fetch('/api/enquiry');
+            const enquiries = await res.json();
+            const tbody = document.querySelector('#enquiryTable tbody');
+            tbody.innerHTML = '';
+            enquiries.forEach(enq => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="text" value="${enq.user_id || ''}" data-id="${enq._id}" class="edit-user_id" /></td>
+                    <td><input type="text" value="${enq.type || ''}" data-id="${enq._id}" class="edit-type" /></td>
+                    <td><input type="text" value="${enq.name || ''}" data-id="${enq._id}" class="edit-name" /></td>
+                    <td><input type="text" value="${enq.phone || ''}" data-id="${enq._id}" class="edit-phone" /></td>
+                    <td><input type="email" value="${enq.email || ''}" data-id="${enq._id}" class="edit-email" /></td>
+                    <td><input type="text" value="${enq.source || ''}" data-id="${enq._id}" class="edit-source" /></td>
+                    <td>
+                        <select data-id="${enq._id}" class="edit-status">
+                            <option value="1" ${enq.status == 1 ? 'selected' : ''}>Active</option>
+                            <option value="0" ${enq.status == 0 ? 'selected' : ''}>Inactive</option>
+                        </select>
+                    </td>
+                    <td><input type="datetime-local" value="${enq.enquiry_date ? new Date(enq.enquiry_date).toISOString().slice(0, 16) : ''}" data-id="${enq._id}" class="edit-enquiry_date" /></td>
+                    <td><input type="datetime-local" value="${enq.followup_date ? new Date(enq.followup_date).toISOString().slice(0, 16) : ''}" data-id="${enq._id}" class="edit-followup_date" /></td>
+                    <td><textarea data-id="${enq._id}" class="edit-notes">${enq.notes || ''}</textarea></td>
+                    <td><input type="text" value="${enq.image || ''}" data-id="${enq._id}" class="edit-image" /></td>
+                    <td class="actions">
+                        <button onclick="updateEnquiry('${enq._id}')">Update</button>
+                        <button onclick="deleteEnquiry('${enq._id}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('enquiryForm').onsubmit = async function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                user_id: form.user_id.value,
+                type: form.type.value,
+                name: form.name.value,
+                phone: form.phone.value,
+                email: form.email.value,
+                source: form.source.value,
+                status: parseInt(form.status.value),
+                enquiry_date: form.enquiry_date.value ? new Date(form.enquiry_date.value).toISOString() : null,
+                followup_date: form.followup_date.value ? new Date(form.followup_date.value).toISOString() : null,
+                notes: form.notes.value,
+                image: form.image.value
+            };
+            const res = await fetch('/api/enquiry', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) {
+                form.reset();
+                fetchEnquiries();
+            } else {
+                alert(await res.text());
+            }
+        };
+
+        async function updateEnquiry(id) {
+            const data = {
+                user_id: document.querySelector(`input.edit-user_id[data-id="${id}"]`).value,
+                type: document.querySelector(`input.edit-type[data-id="${id}"]`).value,
+                name: document.querySelector(`input.edit-name[data-id="${id}"]`).value,
+                phone: document.querySelector(`input.edit-phone[data-id="${id}"]`).value,
+                email: document.querySelector(`input.edit-email[data-id="${id}"]`).value,
+                source: document.querySelector(`input.edit-source[data-id="${id}"]`).value,
+                status: parseInt(document.querySelector(`select.edit-status[data-id="${id}"]`).value),
+                enquiry_date: document.querySelector(`input.edit-enquiry_date[data-id="${id}"]`).value ? new Date(document.querySelector(`input.edit-enquiry_date[data-id="${id}"]`).value).toISOString() : null,
+                followup_date: document.querySelector(`input.edit-followup_date[data-id="${id}"]`).value ? new Date(document.querySelector(`input.edit-followup_date[data-id="${id}"]`).value).toISOString() : null,
+                notes: document.querySelector(`textarea.edit-notes[data-id="${id}"]`).value,
+                image: document.querySelector(`input.edit-image[data-id="${id}"]`).value
+            };
+            const res = await fetch(`/api/enquiry/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) fetchEnquiries();
+            else alert(await res.text());
+        }
+
+        async function deleteEnquiry(id) {
+            if (!confirm('Delete this enquiry?')) return;
+            const res = await fetch(`/api/enquiry/${id}`, { method: 'DELETE' });
+            if (res.ok) fetchEnquiries();
+            else alert(await res.text());
+        }
+
+        fetchEnquiries();
+    </script>
+</body>
+
+</html>
