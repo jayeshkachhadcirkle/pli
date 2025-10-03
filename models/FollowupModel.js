@@ -8,6 +8,11 @@ const followUpSchema = new mongoose.Schema(
             ref: 'EnquiryModel', // Assuming you have an Enquiry model to link with
             required: true,
         },
+        user_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'UserModel', // Assuming you have a User model to link with
+            required: true,
+        },
         enquiry_date: {
             type: Date,
             required: true,

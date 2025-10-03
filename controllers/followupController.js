@@ -8,6 +8,7 @@ exports.createFollowUp = async (req, res) => {
         // Create a new follow-up instance
         const newFollowUp = new FollowUp({
             enquiry_id,
+            user_id: req.user.id, // Assuming req.user is set by authentication middleware
             enquiry_date,
             last_followup_date,
             next_followup_date,
@@ -38,6 +39,16 @@ exports.getFollowUps = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+exports.getUserFollowups = async (req, res) => {
+    try {
+        console.log(req.user);
+        const followUps = await FollowUp.find({ user_id: req.user.id });
+        res.status(200).json(followUps);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 

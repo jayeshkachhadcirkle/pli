@@ -22,6 +22,17 @@ exports.getAllEnquiries = async (req, res) => {
     }
 };
 
+// Get enquiries for the logged-in user
+exports.getUserEnquiries = async (req, res) => {
+    try {
+        console.log(req.user);
+        const enquiries = await Enquiry.find({ user_id: req.user.id });
+        res.status(200).json(enquiries);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // Get a specific enquiry by ID
 exports.getEnquiryById = async (req, res) => {
     try {

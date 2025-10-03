@@ -14,5 +14,8 @@ router.post('/login', loginUser);      // Login user
 router.get('/:id', authenticate, getUserById); // Get user by ID
 router.put('/:id', authenticate, updateUserById); // Update user
 router.delete('/:id', authenticate, deleteUserById); // Delete user
+router.get('/test/auth', authenticate, (req, res) => {
+    res.json({ user: req.user });
+});
 
 module.exports = router;

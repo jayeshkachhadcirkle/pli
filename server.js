@@ -29,8 +29,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/enquiry', enquiryRoutes);
 app.use('/api/followup', followupRoutes);
 
+
+
+
 app.get('/', (req, res) => {
-    res.json({ message: 'Root Here' });
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const port = process.env.PORT || 3000;

@@ -16,18 +16,6 @@
 // followup module = id(s), enquiry_id(s), enquiry_date(s), last_followup_date(s), next_followup_date*, image, notes, status*
 
 
-
-{
-  "message": "Login successful",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZGUxNzRjYmE4OTgyZTBkYzZiZjc4NSIsImVtYWlsIjoidTFAZ21haWwuY29tIiwiaWF0IjoxNzU5Mzg1OTI4LCJleHAiOjE3NTkzODk1Mjh9.owNElWJ21HeWLwmPDADl7TumpdEZmXbCmtPde7Dj61U",
-      "user": {
-    "id": "68de174cba8982e0dc6bf785",
-      "name": "u1",
-        "email": "u1@gmail.com",
-          "phone": "4555455445"
-  }
-}
-
 ==================================================
 fetch('/api/enquiry').then(res => res.json()).then(data => {
   console.log(data)
@@ -91,3 +79,37 @@ fetch('/api/users/68de174cba8982e0dc6bf785').then(res => res.json()).then(data =
 
 =======================================================
 document.cookie = "jwt=token";
+
+=========================================================
+
+fetch('/api/followup').then(res => res.json()).then(data => {
+  console.log(data)
+})
+
+
+let followupData = {
+  "enquiry_id": "651d0c05f2a56b3d1e6f45a1",
+  "user_id": "651d0c13f2a56b3d1e6f45a2",
+  "enquiry_date": "2025-09-25T00:00:00.000Z",
+  "last_followup_date": "2025-10-01T00:00:00.000Z",
+  "next_followup_date": "2025-10-10T00:00:00.000Z",
+  "image": "https://example.com/uploads/followup123.jpg",
+  "notes": "Discussed pricing and next steps. Awaiting confirmation from client.",
+  "status": 1
+}
+
+fetch('http://localhost:3000/api/followup', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+  body: JSON.stringify(followupData)
+})
+  .then(response => response.json())
+  .then(data => {
+    console.log('Enquiry successfully created:', data);
+  })
+  .catch(error => {
+    console.error('Error creating enquiry:', error);
+  });
