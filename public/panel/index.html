@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            margin: 40px;
+        }
+
+        .panel {
+            max-width: 400px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #888;
+            cursor: pointer;
+            background: #eee;
+        }
+
+        button:hover {
+            background: #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="panel">
+        <h2>Welcome </h2>
+        <div class="options">
+            <button onclick="location.href='/profile'">Profile</button>
+            <button onclick="location.href='/enquiries'">Enquiry</button>
+            <button onclick="location.href='/followups'">Followup</button>
+            <button onclick="signout()">Sign Out</button>
+        </div>
+    </div>
+    <script>
+        function signout() {
+            // Clear cookies or tokens if used
+            // Redirect to login page
+            location.href = '/';
+            // clear cookies and local storage
+            document.cookie.split(";").forEach(function (c) {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+            localStorage.clear();
+            sessionStorage.clear();
+        }
+    </script>
+</body>
+
+</html>

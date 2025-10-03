@@ -68,7 +68,8 @@
                     password: form.password.value
                 })
             });
-            alert(await res.text());
+            if (res.ok) location.href = '/panel';
+            else alert(await res.text());
         };
 
         document.getElementById('loginForm').onsubmit = async function (e) {
@@ -82,7 +83,8 @@
                     password: form.password.value
                 })
             });
-            alert(await res.text());
+            if (res.ok) location.href = '/panel';
+            else alert(await res.text());
         };
     </script>
 </body>
