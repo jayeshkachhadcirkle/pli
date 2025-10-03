@@ -27,7 +27,7 @@ const followupRoutes = require('./routes/followupRoutes');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/users', userRoutes);
 app.use('/api/enquiry', enquiryRoutes);
-app.use('/api', followupRoutes);
+app.use('/api/followup', followupRoutes);
 
 app.get('/', (req, res) => {
     res.json({ message: 'Root Here' });

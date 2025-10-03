@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 
 const enquirySchema = new mongoose.Schema({
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'UserModel', required: true },
     type: { type: String, required: true },
     name: { type: String, required: true },
     phone: { type: String, required: true },

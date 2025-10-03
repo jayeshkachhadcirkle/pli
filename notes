@@ -28,14 +28,66 @@
   }
 }
 
-
+==================================================
 fetch('/api/enquiry').then(res => res.json()).then(data => {
   console.log(data)
+})
+
+let enquiryData = {
+  user_id: "68de174cba8982e0dc6bf785",
+  type: "Product Inquiry",
+  name: "John Doe",
+  phone: "+1234567890",
+  email: "johndoe@example.com",
+  source: "Website",
+  status: 1,
+  enquiry_date: "2025-10-03T10:30:00Z",
+  followup_date: "2025-10-05T15:00:00Z",
+  notes: "Interested in learning more about pricing.",
+  image: "https://example.com/images/product-image.jpg"
+};
+
+fetch('http://localhost:3000/api/enquiry', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+  body: JSON.stringify(enquiryData)
+})
+  .then(response => response.json())
+  .then(data => {
+    console.log('Enquiry successfully created:', data);
+  })
+  .catch(error => {
+    console.error('Error creating enquiry:', error);
+  });
+
+==================================================
+
+fetch('/api/followup').then(res => res.json()).then(data => {
+  console.log(data)
+})
+
+=====================================================
+
+fetch('/api/users/login', {
+    method: 'POST',
+    body: JSON.stringify({
+        email: "u1@gmail.com",
+        password:"12345678"
+    }),
+    headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+}).then(res => res.json()).then(data => {
+    console.log(data)
 })
 
 fetch('/api/users/68de174cba8982e0dc6bf785').then(res => res.json()).then(data => {
   console.log(data)
 })
 
-
+=======================================================
 document.cookie = "jwt=token";
