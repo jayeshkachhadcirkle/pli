@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Followup Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            margin: 40px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        form {
+            margin-bottom: 30px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .actions button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Followup Management</h2>
+        <form id="followupForm">
+            <input type="hidden" name="user_id" id="user_id" />
+            <input type="text" name="enquiry_id" placeholder="Enquiry ID" required />
+            <input type="datetime-local" name="enquiry_date" placeholder="Enquiry Date" required />
+            <input type="datetime-local" name="last_followup_date" placeholder="Last Followup Date" required />
+            <input type="datetime-local" name="next_followup_date" placeholder="Next Followup Date" required />
+            <input type="text" name="image" placeholder="Image URL" />
+            <textarea name="notes" placeholder="Notes"></textarea>
+            <select name="status" required>
+                <option value="1">Followup</option>
+                <option value="0">Closed</option>
+            </select>
+            <button type="submit">Create Followup</button>
+        </form>
+        <table id="followupTable">
+            <thead>
+                <tr>
+                    <th>Enquiry ID</th>
+                    <th>User ID</th>
+                    <th>Enquiry Date</th>
+                    <th>Last Followup Date</th>
+                    <th>Next Followup Date</th>
+                    <th>Image</th>
+                    <th>Notes</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Followups will be listed here -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        // Helper to get cookie value by name
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // On page load, set user_id from cookie
+        window.onload = function () {
+            const userId = getCookie('user_id');
+            if (userId) {
+                document.getElementById('user_id').value = userId;
+            }
+        };
+
+        async function fetchFollowups() {
+            const res = await fetch('/api/followup');
+            const followups = await res.json();
+            const tbody = document.querySelector('#followupTable tbody');
+            tbody.innerHTML = '';
+            followups.forEach(fu => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="text" value="${fu.enquiry_id || ''}" data-id="${fu._id}" class="edit-enquiry_id" /></td>
+                    <td><input type="text" value="${fu.user_id || ''}" data-id="${fu._id}" class="edit-user_id" /></td>
+                    <td><input type="datetime-local" value="${fu.enquiry_date ? new Date(fu.enquiry_date).toISOString().slice(0, 16) : ''}" data-id="${fu._id}" class="edit-enquiry_date" /></td>
+                    <td><input type="datetime-local" value="${fu.last_followup_date ? new Date(fu.last_followup_date).toISOString().slice(0, 16) : ''}" data-id="${fu._id}" class="edit-last_followup_date" /></td>
+                    <td><input type="datetime-local" value="${fu.next_followup_date ? new Date(fu.next_followup_date).toISOString().slice(0, 16) : ''}" data-id="${fu._id}" class="edit-next_followup_date" /></td>
+                    <td><input type="text" value="${fu.image || ''}" data-id="${fu._id}" class="edit-image" /></td>
+                    <td><textarea data-id="${fu._id}" class="edit-notes">${fu.notes || ''}</textarea></td>
+                    <td>
+                        <select data-id="${fu._id}" class="edit-status">
+                            <option value="1" ${fu.status == 1 ? 'selected' : ''}>Followup</option>
+                            <option value="0" ${fu.status == 0 ? 'selected' : ''}>Closed</option>
+                        </select>
+                    </td>
+                    <td class="actions">
+                        <button onclick="updateFollowup('${fu._id}')">Update</button>
+                        <button onclick="deleteFollowup('${fu._id}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('followupForm').onsubmit = async function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                enquiry_id: form.enquiry_id.value,
+                user_id: form.user_id.value,
+                enquiry_date: form.enquiry_date.value ? new Date(form.enquiry_date.value).toISOString() : null,
+                last_followup_date: form.last_followup_date.value ? new Date(form.last_followup_date.value).toISOString() : null,
+                next_followup_date: form.next_followup_date.value ? new Date(form.next_followup_date.value).toISOString() : null,
+                image: form.image.value,
+                notes: form.notes.value,
+                status: parseInt(form.status.value)
+            };
+            const res = await fetch('/api/followup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) {
+                form.reset();
+                fetchFollowups();
+            } else {
+                alert(await res.text());
+            }
+        };
+
+        async function updateFollowup(id) {
+            const data = {
+                enquiry_id: document.querySelector(`input.edit-enquiry_id[data-id="${id}"]`).value,
+                user_id: document.querySelector(`input.edit-user_id[data-id="${id}"]`).value,
+                enquiry_date: document.querySelector(`input.edit-enquiry_date[data-id="${id}"]`).value ? new Date(document.querySelector(`input.edit-enquiry_date[data-id="${id}"]`).value).toISOString() : null,
+                last_followup_date: document.querySelector(`input.edit-last_followup_date[data-id="${id}"]`).value ? new Date(document.querySelector(`input.edit-last_followup_date[data-id="${id}"]`).value).toISOString() : null,
+                next_followup_date: document.querySelector(`input.edit-next_followup_date[data-id="${id}"]`).value ? new Date(document.querySelector(`input.edit-next_followup_date[data-id="${id}"]`).value).toISOString() : null,
+                image: document.querySelector(`input.edit-image[data-id="${id}"]`).value,
+                notes: document.querySelector(`textarea.edit-notes[data-id="${id}"]`).value,
+                status: parseInt(document.querySelector(`select.edit-status[data-id="${id}"]`).value)
+            };
+            const res = await fetch(`/api/followup/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) fetchFollowups();
+            else alert(await res.text());
+        }
+
+        async function deleteFollowup(id) {
+            if (!confirm('Delete this followup?')) return;
+            const res = await fetch(`/api/followup/${id}`, { method: 'DELETE' });
+            if (res.ok) fetchFollowups();
+            else alert(await res.text());
+        }
+
+        fetchFollowups();
+    </script>
+</body>
+
+</html>

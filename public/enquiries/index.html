@@ -149,7 +149,7 @@
                         </select>
                     </td>
                     <td><input type="datetime-local" value="${enq.enquiry_date ? new Date(enq.enquiry_date).toISOString().slice(0, 16) : ''}" data-id="${enq._id}" class="edit-enquiry_date" /></td>
-                    <td><input type="datetime-local" value="${enq.followup_date ? new Date(enq.followup_date).toISOString().slice(0, 16) : ''}" data-id="${enq._id}" class="edit-followup_date" /></td>
+                    <td><input type="datetime-loca  l" value="${enq.followup_date ? new Date(enq.followup_date).toISOString().slice(0, 16) : ''}" data-id="${enq._id}" class="edit-followup_date" /></td>
                     <td><textarea data-id="${enq._id}" class="edit-notes">${enq.notes || ''}</textarea></td>
                     <td><input type="text" value="${enq.image || ''}" data-id="${enq._id}" class="edit-image" /></td>
                     <td class="actions">
