@@ -1,11 +1,27 @@
 // controllers/enquiryController.js
 const Enquiry = require('../models/EnquiryModel');
+const FollowUp = require('../models/FollowupModel'); // Import the Follow-up model
 
 // Create a new enquiry
 exports.createEnquiry = async (req, res) => {
     try {
         const enquiry = new Enquiry(req.body);
         await enquiry.save();
+
+        const newFollowUp = new FollowUp({
+            enquiry_id: enquiry._id,
+            user_id: req.user.id, // Assuming req.user is set by authentication middleware
+            enquiry_date: enquiry.enquiry_date,
+            last_followup_date: enquiry.followup_date,
+            next_followup_date: enquiry.followup_date,
+            image: enquiry.image,
+            notes: enquiry.notes,
+            status: enquiry.status,
+        });
+
+        // Save the follow-up to the database
+        await newFollowUp.save();
+
         res.status(201).json(enquiry);
     } catch (error) {
         res.status(400).json({ message: error.message });
