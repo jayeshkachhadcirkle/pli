@@ -5,6 +5,8 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 // const authenticate = require('./authenticate');
+// In your backend server setup
+const cors = require('cors');
 
 require('dotenv').config();
 
@@ -19,6 +21,11 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.log('Failed to connect to MongoDB', err));
 
+app.use(cors({
+    origin: 'http://localhost:4400',
+    credentials: true // Allow cookies to be sent
+}));
+
 const userRoutes = require('./routes/userRoutes');
 const enquiryRoutes = require('./routes/enquiryRoutes');
 const followupRoutes = require('./routes/followupRoutes');
@@ -31,6 +38,9 @@ app.use('/api/followup', followupRoutes);
 
 
 
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));

@@ -5,11 +5,50 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // CREATE: Add a new user
+// const createUser = async (req, res) => {
+//     const { name, email, phone, password } = req.body;
+
+//     try {
+//         const user = new User({ name, email, phone, password, createdAt: new Date(), updatedAt: new Date() });
+//         await user.save();
+
+//         const token = jwt.sign(
+//             { id: user._id, email: user.email },
+//             process.env.JWT_SECRET,
+//             { expiresIn: process.env.JWT_EXPIRATION }
+//         );
+
+//         res.cookie('jwt', token, {
+//             httpOnly: true,   // Can't be accessed via JavaScript
+//             secure: true,     // Use this in production (only over HTTPS)
+//             maxAge: 3600000,  // Expiry time in milliseconds (e.g., 1 hour)
+//             sameSite: 'Strict', // Optional: Prevent CSRF attacks
+//         });
+
+//         res.cookie('user_id', user._id, {
+//             httpOnly: false,  // Can be accessed via JavaScript (for use in front-end)
+//             secure: true,     // Use this in production (only over HTTPS)
+//             maxAge: 3600000,  // Expiry time in milliseconds
+//             sameSite: 'Strict', // Optional: Prevent CSRF attacks
+//         });
+
+//         res.status(201).json({ user, token: token }); // Return the created user
+//     } catch (error) {
+//         res.status(400).json({ message: 'Error creating user', error });
+//     }
+// };
+
+
+
 const createUser = async (req, res) => {
     const { name, email, phone, password } = req.body;
 
     try {
-        const user = new User({ name, email, phone, password, createdAt: new Date(), updatedAt: new Date() });
+        const user = new User({
+            name, email, phone, password,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        });
         await user.save();
 
         const token = jwt.sign(
@@ -18,25 +57,29 @@ const createUser = async (req, res) => {
             { expiresIn: process.env.JWT_EXPIRATION }
         );
 
+        // Detect if request is from Electron
+        const isElectron = req.headers['user-agent']?.includes('Electron');
+
         res.cookie('jwt', token, {
-            httpOnly: true,   // Can't be accessed via JavaScript
-            secure: true,     // Use this in production (only over HTTPS)
-            maxAge: 3600000,  // Expiry time in milliseconds (e.g., 1 hour)
-            sameSite: 'Strict', // Optional: Prevent CSRF attacks
+            httpOnly: false,
+            secure: false,
+            maxAge: 3600000,
+            sameSite: 'Lax',
         });
 
         res.cookie('user_id', user._id, {
-            httpOnly: false,  // Can be accessed via JavaScript (for use in front-end)
-            secure: true,     // Use this in production (only over HTTPS)
-            maxAge: 3600000,  // Expiry time in milliseconds
-            sameSite: 'Strict', // Optional: Prevent CSRF attacks
+            httpOnly: false,
+            secure: false, // Disable secure in Electron
+            maxAge: 3600000,
+            sameSite: 'Lax',
         });
 
-        res.status(201).json({ user, token: token }); // Return the created user
+        res.status(201).json({ user, token: token });
     } catch (error) {
         res.status(400).json({ message: 'Error creating user', error });
     }
 };
+
 
 // LOGIN: Authenticate user and generate JWT
 const loginUser = async (req, res) => {
@@ -67,18 +110,33 @@ const loginUser = async (req, res) => {
             phone: user.phone
         }
 
+        //  Secure
+        // res.cookie('jwt', token, {
+        //     httpOnly: true,   // Can't be accessed via JavaScript
+        //     secure: true,     // Use this in production (only over HTTPS)
+        //     maxAge: 3600000,  // Expiry time in milliseconds (e.g., 1 hour)
+        //     sameSite: 'Strict', // Optional: Prevent CSRF attacks
+        // });
+
+        // res.cookie('user_id', user._id, {
+        //     httpOnly: false,  // Can be accessed via JavaScript (for use in front-end)
+        //     secure: true,     // Use this in production (only over HTTPS)
+        //     maxAge: 3600000,  // Expiry time in milliseconds
+        //     sameSite: 'Strict', // Optional: Prevent CSRF attacks
+        // });
+
         res.cookie('jwt', token, {
-            httpOnly: true,   // Can't be accessed via JavaScript
-            secure: true,     // Use this in production (only over HTTPS)
+            httpOnly: false,   // Can't be accessed via JavaScript
+            secure: false,     // Use this in production (only over HTTPS)
             maxAge: 3600000,  // Expiry time in milliseconds (e.g., 1 hour)
-            sameSite: 'Strict', // Optional: Prevent CSRF attacks
+            sameSite: 'Lax', // Optional: Prevent CSRF attacks
         });
 
         res.cookie('user_id', user._id, {
             httpOnly: false,  // Can be accessed via JavaScript (for use in front-end)
-            secure: true,     // Use this in production (only over HTTPS)
+            secure: false,     // Use this in production (only over HTTPS)
             maxAge: 3600000,  // Expiry time in milliseconds
-            sameSite: 'Strict', // Optional: Prevent CSRF attacks
+            sameSite: 'Lax', // Optional: Prevent CSRF attacks
         });
 
         res.status(200).json({ message: 'Login successful', token, user: userData });
