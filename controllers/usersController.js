@@ -129,14 +129,14 @@ const loginUser = async (req, res) => {
             httpOnly: false,   // Can't be accessed via JavaScript
             secure: false,     // Use this in production (only over HTTPS)
             maxAge: 3600000,  // Expiry time in milliseconds (e.g., 1 hour)
-            sameSite: 'Lax', // Optional: Prevent CSRF attacks
+            sameSite: 'None', // Optional: Prevent CSRF attacks
         });
 
         res.cookie('user_id', user._id, {
             httpOnly: false,  // Can be accessed via JavaScript (for use in front-end)
             secure: false,     // Use this in production (only over HTTPS)
             maxAge: 3600000,  // Expiry time in milliseconds
-            sameSite: 'Lax', // Optional: Prevent CSRF attacks
+            sameSite: 'None', // Optional: Prevent CSRF attacks
         });
 
         res.status(200).json({ message: 'Login successful', token, user: userData });
